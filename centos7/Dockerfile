@@ -20,6 +20,19 @@ RUN yum update -y \
 	&& localedef -c -f UTF-8 -i en_US en_US.UTF-8 \
 	&& export LC_ALL=en_US.UTF-8 
 
+WORKDIR /lib/systemd/system/sysinit.target.wants/
+
+RUN for i in *; do [ $i == "systemd-tmpfiles-setup.service" ] || rm -f "$i"; done; \
+    rm -f /lib/systemd/system/multi-user.target.wants/*;\
+    rm -f /etc/systemd/system/*.wants/*;\
+    rm -f /lib/systemd/system/local-fs.target.wants/*; \
+    rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
+    rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
+    rm -f /lib/systemd/system/basic.target.wants/*;\
+    rm -f /lib/systemd/system/anaconda.target.wants/*;
+
+WORKDIR /
+
 # Disable requiretty.
 RUN sed -i -e "s/^\(Defaults\s*requiretty\)/#--- \1/"  /etc/sudoers \
 	&& groupadd -g ${gid} ${group} \
@@ -33,11 +46,10 @@ RUN mkdir -p /etc/ansible \
 	&& echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
 
 USER jenkins
-RUN  sudo localedef -c -f UTF-8 -i en_US en_US.UTF-8 \
-	&& export LC_ALL=en_US.UTF-8 \
-    && export PATH=$HOME/bin:$HOME/.local/bin:$PATH \
+RUN export LC_ALL=en_US.UTF-8 \
+    && export PATH="$HOME/bin:$HOME/.local/bin:$PATH" \
     && echo 'export PATH=$HOME/bin:$HOME/.local/bin:$PATH' >> $HOME/.bashrc \
 	&& pip3 install --no-cache-dir ansible ansible-lint molecule-docker
 
-VOLUME ["/sys/fs/cgroup"]
-# CMD ["/usr/lib/systemd/systemd"]
+VOLUME [ "/sys/fs/cgroup" ]
+CMD ["/usr/sbin/init"]
