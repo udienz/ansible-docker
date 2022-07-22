@@ -1,3 +1,5 @@
+# Inspired from https://github.com/geerlingguy/docker-centos7-ansible/blob/master/Dockerfile
+
 FROM centos:7
 LABEL maintainer="Jeff Geerling"
 ENV container=docker
@@ -47,9 +49,10 @@ RUN mkdir -p /etc/ansible \
 
 USER jenkins
 RUN export LC_ALL=en_US.UTF-8 \
+    && echo "LC_ALL=en_US.UTF-8" >> $HOME/.bashrc \
     && export PATH="$HOME/bin:$HOME/.local/bin:$PATH" \
     && echo 'export PATH=$HOME/bin:$HOME/.local/bin:$PATH' >> $HOME/.bashrc \
 	&& pip3 install --no-cache-dir ansible ansible-lint molecule-docker
 
 VOLUME [ "/sys/fs/cgroup" ]
-CMD ["/usr/sbin/init"]
+CMD ["/usr/lib/systemd/systemd"]
