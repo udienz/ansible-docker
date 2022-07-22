@@ -1,9 +1,5 @@
-# Inspired from https://github.com/geerlingguy/docker-centos7-ansible/blob/master/Dockerfile
-
-FROM centos:7
-LABEL maintainer="Jeff Geerling"
-ENV container=docker
-
+FROM geerlingguy/docker-centos7-ansible
+LABEL maintainer="Mahyuddin Susanto"
 
 ARG user=jenkins
 ARG group=jenkins
@@ -19,21 +15,7 @@ RUN yum update -y \
     && yum -y install sudo which python3-pip libselinux-python3 git git-lfs  \
     && yum clean all \
     && pip3 install --upgrade --no-cache-dir pip \
-	&& localedef -c -f UTF-8 -i en_US en_US.UTF-8 \
-	&& export LC_ALL=en_US.UTF-8 
-
-WORKDIR /lib/systemd/system/sysinit.target.wants/
-
-RUN for i in *; do [ $i == "systemd-tmpfiles-setup.service" ] || rm -f "$i"; done; \
-    rm -f /lib/systemd/system/multi-user.target.wants/*;\
-    rm -f /etc/systemd/system/*.wants/*;\
-    rm -f /lib/systemd/system/local-fs.target.wants/*; \
-    rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
-    rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
-    rm -f /lib/systemd/system/basic.target.wants/*;\
-    rm -f /lib/systemd/system/anaconda.target.wants/*;
-
-WORKDIR /
+	&& localedef -c -f UTF-8 -i en_US en_US.UTF-8
 
 # Disable requiretty.
 RUN sed -i -e "s/^\(Defaults\s*requiretty\)/#--- \1/"  /etc/sudoers \
@@ -52,6 +34,7 @@ RUN export LC_ALL=en_US.UTF-8 \
     && echo "LC_ALL=en_US.UTF-8" >> $HOME/.bashrc \
     && export PATH="$HOME/bin:$HOME/.local/bin:$PATH" \
     && echo 'export PATH=$HOME/bin:$HOME/.local/bin:$PATH' >> $HOME/.bashrc \
+    && python3 -m pip install --upgrade pip \
 	&& pip3 install --no-cache-dir ansible ansible-lint molecule-docker
 
 VOLUME [ "/sys/fs/cgroup" ]
