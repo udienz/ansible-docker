@@ -25,7 +25,7 @@ pipeline {
         sh 'docker build -t udienz/docker-ansible:jammy ubuntu/jammy'
       }
     }
-    stage('Docker Push CentOS 7') {
+    stage('Docker Push Ubuntu Jammy') {
       agent any
       steps {
         withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
