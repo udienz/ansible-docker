@@ -2,6 +2,12 @@
 
 pipeline {
   agent none
+  options {
+    timestamps()
+    ansiColor("xterm")
+    buildDiscarder(logRotator(numToKeepStr: "100"))
+    timeout(time: 1, unit: "HOURS")
+  }
   stages {
     stage('Docker Build CentOS') {
       agent any
