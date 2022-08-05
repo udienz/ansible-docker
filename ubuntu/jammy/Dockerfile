@@ -15,7 +15,7 @@ RUN ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
     && apt dist-upgrade -y \
     &&  apt-get install -y -q --no-install-recommends \
     git python3-pip locales libffi-dev libssl-dev libyaml-dev python3-dev \
-    python3-setuptools python3-yaml iproute2 wget \
+    python3-setuptools python3-yaml iproute2 wget openssh-client \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/* \
     && groupadd -g ${gid} ${group} \
     && useradd -d "${JENKINS_AGENT_HOME}" -u "${uid}" -g "${gid}" -m \

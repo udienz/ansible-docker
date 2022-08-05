@@ -12,6 +12,7 @@ pipeline {
     stage('Docker Build CentOS') {
       agent any
       steps {
+        bitbucketStatusNotify(buildState: 'INPROGRESS')
         sh 'docker build -t udienz/docker-ansible:centos7 centos7/'
       }
     }
@@ -23,8 +24,7 @@ pipeline {
           sh 'docker push udienz/docker-ansible:centos7'
         }
       }
-    }
-// EOL CENTOS
+    } // EOL CENTOS
     stage('Docker Build Ubuntu Jammy') {
       agent any
       steps {
@@ -37,11 +37,28 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
           sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
           sh 'docker push udienz/docker-ansible:jammy'
-          sh 'docker push udienz/docker-ansible:ubuntu2204'
         }
       }
-    }
-// EOL Ubuntu Jammy
-  }
-// EOL STAGES
+    } // EOL Ubuntu Jammy
+  } // EOL STAGES
+  post {
+	always {
+          deleteDir()
+	      }
+	failure {
+            bitbucketStatusNotify(buildState: 'FAILED', commitId: "${env.GIT_COMMIT}")
+        }
+    unstable {
+            bitbucketStatusNotify(buildState: 'SUCCESSFUL', commitId: "${env.GIT_COMMIT}")
+        }
+    success {
+            bitbucketStatusNotify(buildState: 'SUCCESSFUL', commitId: "${env.GIT_COMMIT}")
+        }
+    aborted {
+            bitbucketStatusNotify(buildState: 'FAILED', commitId: "${env.GIT_COMMIT}")
+        }
+    fixed {
+            bitbucketStatusNotify(buildState: 'SUCCESSFUL', commitId: "${env.GIT_COMMIT}")
+        }
+  } // EOL post
 }
