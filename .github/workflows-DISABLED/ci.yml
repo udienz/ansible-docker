@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@master
 
       - name: Build and publish to registry
-        uses: elgohr/Publish-Docker-Github-Action@master
+        uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: udienz/docker-ansible
           username: ${{ github.actor }}
